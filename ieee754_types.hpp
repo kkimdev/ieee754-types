@@ -97,15 +97,46 @@ struct FindType<F> {
   using type = TypeNotFound<void>;
 };
 
+///////////////////////////////////////
+
+template <typename F, typename... Ts>
+struct FindType2;
+
+template <typename F, typename T, typename... Ts>
+struct FindType2<F, T, Ts...> {
+  using type = ::std::conditional_t<  //
+      F::template value<T>(), T, typename FindType2<F, Ts...>::type>;
+};
+
+template <typename F>
+struct FindType2<F> {
+  using type = void;
+};
+
+template <typename T, int storage_bits, typename U = void>
+struct TestStorageBits {
+  static_assert(sizeof(T) == storage_bits / CHAR_BIT, "");
+};
+
+template <typename T, int storage_bits>
+struct TestStorageBits<T,             //
+                       storage_bits,  //
+                       ::std::enable_if_t<::std::is_same_v<T, void>>> {};
+
+TestStorageBits<float, 32> f1;
+TestStorageBits<double, 64> f2;
+
+///////////////////////////////////////
+
 template <int storage_bits,
           int exponent_bits =
               standard_binary_interchange_format_exponent_bits(storage_bits),
           int mantissa_bits =
               standard_binary_interchange_format_mantissa_bits(storage_bits)>
 using Binary =
-    typename FindType<Is_Ieee754_2008_Binary_Interchange_Format<
-                          storage_bits, exponent_bits, mantissa_bits>,
-                      float, double, long double>::type;
+    typename FindType2<Is_Ieee754_2008_Binary_Interchange_Format<
+                           storage_bits, exponent_bits, mantissa_bits>,
+                       float, double, long double>::type;
 
 }  // namespace detail
 

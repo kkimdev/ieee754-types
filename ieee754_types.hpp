@@ -10,27 +10,27 @@ namespace IEEE_754 {
 namespace detail {
 
 template <typename T>
-constexpr ::std::size_t get_storage_bits() {
+constexpr int get_storage_bits() {
   return sizeof(T) * CHAR_BIT;
 }
 
-constexpr ::std::size_t num_bits(::std::size_t x) {
+constexpr int num_bits(int x) {  //
   return x == 0 ? 0 : 1 + num_bits(x >> 1);
 }
 
 template <typename T>
-constexpr ::std::size_t get_exponent_bits() {
+constexpr int get_exponent_bits() {
   return num_bits(::std::numeric_limits<T>::max_exponent -
                   ::std::numeric_limits<T>::min_exponent);
 }
 
 template <typename T>
-constexpr ::std::size_t get_mantissa_bits() {
+constexpr int get_mantissa_bits() {
   return ::std::numeric_limits<T>::digits - 1;
 }
 
-constexpr ::std::size_t standard_binary_interchange_format_exponent_bits(
-    ::std::size_t storage_bits) {
+constexpr int standard_binary_interchange_format_exponent_bits(
+    int storage_bits) {
   if (storage_bits == 16) return 5;
   if (storage_bits == 32) return 8;
   if (storage_bits == 64) return 11;
@@ -45,8 +45,8 @@ constexpr ::std::size_t standard_binary_interchange_format_exponent_bits(
       "of 32 of at least 128.");
 }
 
-constexpr ::std::size_t standard_binary_interchange_format_mantissa_bits(
-    ::std::size_t storage_bits) {
+constexpr int standard_binary_interchange_format_mantissa_bits(
+    int storage_bits) {
   return storage_bits -
          standard_binary_interchange_format_exponent_bits(storage_bits) - 1;
 }
@@ -60,9 +60,7 @@ static_assert(standard_binary_interchange_format_mantissa_bits(64) == 52, "");
 static_assert(standard_binary_interchange_format_exponent_bits(128) == 15, "");
 static_assert(standard_binary_interchange_format_mantissa_bits(128) == 112, "");
 
-template <::std::size_t storage_bits,   //
-          ::std::size_t exponent_bits,  //
-          ::std::size_t mantissa_bits>
+template <int storage_bits, int exponent_bits, int mantissa_bits>
 struct Is_Ieee754_2008_Binary_Interchange_Format {
   template <typename T>
   static constexpr bool value() {
@@ -76,43 +74,43 @@ struct Is_Ieee754_2008_Binary_Interchange_Format {
 };
 
 template <typename F, typename... Ts>
-struct TODO_NAMING2;
+struct FindType;
 
 // Recursion
 template <typename F, typename T, typename... Ts>
-struct TODO_NAMING2<F, T, Ts...> {
+struct FindType<F, T, Ts...> {
   // Set `type = T` if T satisfies the condition, F.  Otherwise, keep searching
   // in the remaining types, Ts... .
   using type = ::std::conditional_t<  //
-      F::template value<T>(), T, typename TODO_NAMING2<F, Ts...>::type>;
+      F::template value<T>(), T, typename FindType<F, Ts...>::type>;
 };
 
 // Recursion termination.  Type not found.
 template <typename F>
-struct TODO_NAMING2<F> {
+struct FindType<F> {
   template <typename T>
-  struct BinaryInterchangeFormatNotFound {
+  struct TypeNotFound {
     static_assert(
         !::std::is_same_v<T, T>,
         "No corresponding IEEE 754-2008 binary interchange format found.");
   };
-  using type = BinaryInterchangeFormatNotFound<void>;
+  using type = TypeNotFound<void>;
 };
 
-template <::std::size_t storage_bits,
-          ::std::size_t exponent_bits =
+template <int storage_bits,
+          int exponent_bits =
               standard_binary_interchange_format_exponent_bits(storage_bits),
-          ::std::size_t mantissa_bits =
+          int mantissa_bits =
               standard_binary_interchange_format_mantissa_bits(storage_bits)>
 using Binary =
-    typename TODO_NAMING2<Is_Ieee754_2008_Binary_Interchange_Format<
-                              storage_bits, exponent_bits, mantissa_bits>,
-                          float, double, int, long double>::type;
+    typename FindType<Is_Ieee754_2008_Binary_Interchange_Format<
+                          storage_bits, exponent_bits, mantissa_bits>,
+                      float, double, long double>::type;
 
 }  // namespace detail
 
 namespace _2008 {
-template <::std::size_t storage_bits>
+template <int storage_bits>
 using Binary = detail::Binary<storage_bits>;
 }  // namespace _2008
 

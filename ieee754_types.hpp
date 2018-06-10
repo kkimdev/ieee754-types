@@ -111,8 +111,10 @@ using Binary =
 
 }  // namespace detail
 
+namespace _2008 {
 template <::std::size_t storage_bits>
 using Binary = detail::Binary<storage_bits>;
+}
 
 }  // namespace IEEE_754
 

@@ -79,15 +79,15 @@ struct Foo<storage_bits, exponent_bits, mantissa_bits, T, Ts...> {
 
 template <int storage_bits, int exponent_bits, int mantissa_bits>
 struct Foo<storage_bits, exponent_bits, mantissa_bits> {
-  template <int storage_bits2, int exponent_bits2, int mantissa_bits2>
+  template <bool t>
   class BinaryFormatNotFound {
     // `false && storage_bits` is a hack to postpone static_assert to template
     // instantiation.
     static_assert(
-        false && storage_bits2,
+        false && t,
         "No corresponding IEEE 754-2008 binary interchange format found.");
   };
-  using type = BinaryFormatNotFound<storage_bits, exponent_bits, mantissa_bits>;
+  using type = BinaryFormatNotFound<true>;
 };
 
 template <int storage_bits,

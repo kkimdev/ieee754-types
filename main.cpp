@@ -13,10 +13,7 @@ constexpr ::std::size_t get_storage_bits() {
 }
 
 constexpr ::std::size_t num_bits(::std::size_t x) {
-  if (x == 0)
-    return 0;
-  else
-    return 1 + num_bits(x >> 1);
+  return x == 0 ? 0 : 1 + num_bits(x >> 1);
 }
 
 template <typename T>
@@ -67,36 +64,41 @@ constexpr bool is_ieee_754_2008_binary_interchange_format() {
          mantissa_bits == get_mantissa_bits<T>();
 }
 
-template <int storage_bits, int exponent_bits, int mantissa_bits>
-class BinaryFormatNotFound {
-  // `false && storage_bits` is a hack to postpone static_assert to template
-  // instantiation.
-  static_assert(
-      false && storage_bits,
-      "No corresponding IEEE 754-2008 binary interchange format found.");
+template <int storage_bits, int exponent_bits, int mantissa_bits,
+          typename... Ts>
+struct Foo;
+
+template <int storage_bits, int exponent_bits, int mantissa_bits, typename T,
+          typename... Ts>
+struct Foo<storage_bits, exponent_bits, mantissa_bits, T, Ts...> {
+  using type = ::std::conditional_t<
+      is_ieee_754_2008_binary_interchange_format<T, storage_bits, exponent_bits,
+                                                 mantissa_bits>(),
+      T, typename Foo<storage_bits, exponent_bits, mantissa_bits, Ts...>::type>;
 };
 
-template <int total_bits,
-          int exponent_bits =
-              standard_binary_interchange_format_exponent_bits(total_bits),
-          int mantissa_bits =
-              standard_binary_interchange_format_mantissa_bits(total_bits)>
-using Binary =  //
-    ::std::conditional_t<
-        is_ieee_754_2008_binary_interchange_format<
-            float, total_bits, exponent_bits, mantissa_bits>(),
-        float,
-        ::std::conditional_t<
-            is_ieee_754_2008_binary_interchange_format<
-                double, total_bits, exponent_bits, mantissa_bits>(),
-            double,
-            ::std::conditional_t<
-                is_ieee_754_2008_binary_interchange_format<
-                    long double, total_bits, exponent_bits, mantissa_bits>(),
-                long double,
-                BinaryFormatNotFound<total_bits, exponent_bits,
-                                     mantissa_bits>>>>;
+template <int storage_bits, int exponent_bits, int mantissa_bits>
+struct Foo<storage_bits, exponent_bits, mantissa_bits> {
+  template <int storage_bits2, int exponent_bits2, int mantissa_bits2>
+  class BinaryFormatNotFound {
+    // `false && storage_bits` is a hack to postpone static_assert to template
+    // instantiation.
+    static_assert(
+        false && storage_bits2,
+        "No corresponding IEEE 754-2008 binary interchange format found.");
+  };
+  using type = BinaryFormatNotFound<storage_bits, exponent_bits, mantissa_bits>;
+};
 
+template <int storage_bits,
+          int exponent_bits =
+              standard_binary_interchange_format_exponent_bits(storage_bits),
+          int mantissa_bits =
+              standard_binary_interchange_format_mantissa_bits(storage_bits)>
+using Binary = typename Foo<storage_bits, exponent_bits, mantissa_bits, float,
+                            double, long double>::type;
+
+/////////////////////
 }  // namespace detail
 
 template <int storage_bits>
@@ -104,8 +106,10 @@ using Binary = detail::Binary<storage_bits>;
 
 }  // namespace IEEE_754_2008
 
+#include <iostream>
 int main() {
-  ::IEEE_754_2008::Binary<64> f = 3;
+  IEEE_754_2008::Binary<32> f;
+  std::cout << f;
   return 0;
 }
 

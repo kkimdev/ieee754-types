@@ -25,8 +25,8 @@ constexpr int get_storage_bits() {
 
 template <typename T>
 constexpr int get_exponent_bits() {
-  constexpr int exponent_range = ::std::numeric_limits<T>::max_exponent -
-                                 ::std::numeric_limits<T>::min_exponent;
+  int exponent_range = ::std::numeric_limits<T>::max_exponent -
+                       ::std::numeric_limits<T>::min_exponent;
   int bits = 0;
   while ((exponent_range >> bits) > 0) ++bits;
   return bits;

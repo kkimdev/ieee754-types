@@ -91,6 +91,37 @@ struct Is_Ieee754_2008_Binary_Interchange_Format {
   }
 };
 
+///////////////////////////////
+
+// WIP
+// template <int storage_bits, int exponent_bits, int mantissa_bits, typename T>
+// static constexpr bool is_binary_interchange_format() {
+//   return ::std::is_floating_point<T>() &&            //
+//          ::std::numeric_limits<T>::is_iec559 &&      //
+//          ::std::numeric_limits<T>::radix == 2 &&     //
+//          get_storage_bits<T>() == storage_bits &&    //
+//          get_exponent_bits<T>() == exponent_bits &&  //
+//          get_mantissa_bits<T>() == mantissa_bits;
+// }
+
+// template <int storage_bits, int exponent_bits, int mantissa_bits>
+// void find_type();
+
+// template <int storage_bits, int exponent_bits, int mantissa_bits, typename T,
+//           typename... Ts>
+// auto find_type() {
+//   if constexpr (is_binary_interchange_format<storage_bits,   //
+//                                              exponent_bits,  //
+//                                              mantissa_bits,  //
+//                                              T>()) {
+//     return T();
+//   } else {
+//     return find_type<storage_bits, exponent_bits, mantissa_bits, Ts...>();
+//   }
+// }
+
+///////////////////////////////
+
 template <typename F, typename... Ts>
 struct FindType;
 
@@ -109,17 +140,12 @@ struct FindType<F> {
   using type = void;
 };
 
-template <typename T, typename = void>
-struct AssertTypeFound {
-  using type = T;
-};
-
-// Error if T is void.
 template <typename T>
-struct AssertTypeFound<T, ::std::enable_if_t<::std::is_same_v<T, void>>> {
+struct AssertTypeFound {
   static_assert(
-      !::std::is_same_v<T, T>,
+      !::std::is_same_v<T, void>,
       "No corresponding IEEE 754-2008 binary interchange format found.");
+  using type = T;
 };
 
 template <int storage_bits,

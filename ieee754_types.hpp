@@ -131,7 +131,7 @@ using BinaryFloatOrVoid = typename FindType<                  //
     float, double, long double>::type;
 
 template <int storage_bits>
-using BinaryOrError =
+using BinaryFloatOrError =
     typename AssertTypeFound<BinaryFloatOrVoid<storage_bits>>::type;
 
 template <typename T, int storage_bits, int exponent_bits, int mantissa_bits,
@@ -158,7 +158,7 @@ struct Asserts {
 
 namespace _2008 {
 template <int storage_bits>
-using Binary = detail::BinaryOrError<storage_bits>;
+using Binary = detail::BinaryFloatOrError<storage_bits>;
 }  // namespace _2008
 
 }  // namespace IEEE_754

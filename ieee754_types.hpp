@@ -23,14 +23,13 @@ constexpr int get_storage_bits() {
   return sizeof(T) * CHAR_BIT;
 }
 
-constexpr int num_bits(int x) {  //
-  return x == 0 ? 0 : 1 + num_bits(x >> 1);
-}
-
 template <typename T>
 constexpr int get_exponent_bits() {
-  return num_bits(::std::numeric_limits<T>::max_exponent -
-                  ::std::numeric_limits<T>::min_exponent);
+  constexpr int exponent_range = ::std::numeric_limits<T>::max_exponent -
+                                 ::std::numeric_limits<T>::min_exponent;
+  int bits = 0;
+  while ((exponent_range >> bits) > 0) ++bits;
+  return bits;
 }
 
 template <typename T>

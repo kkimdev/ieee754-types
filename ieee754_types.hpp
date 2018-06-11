@@ -133,23 +133,21 @@ using BinaryOrError =
 // TODO:
 template <typename T, int storage_bits, int exponent_bits, int mantissa_bits,
           typename = void>
-struct Test {
-  //   using T = BinaryOrError<storage_bits>;
+struct TestIfNotVoid {
   static_assert(get_storage_bits<T>() == storage_bits, "");
   static_assert(get_exponent_bits<T>() == exponent_bits, "");
   static_assert(get_mantissa_bits<T>() == mantissa_bits, "");
 };
 
-template <int storage_bits, int exponent_bits, int mantissa_bits>
-struct Test<
-    storage_bits, exponent_bits, mantissa_bits,
-    ::std::enable_if_t<::std::is_same_v<BinaryOrVoid<storage_bits>, void>>> {};
+template <typename T, int storage_bits, int exponent_bits, int mantissa_bits>
+struct TestIfNotVoid<T, storage_bits, exponent_bits, mantissa_bits,
+                     ::std::enable_if_t<::std::is_same_v<T, void>>> {};
 
 struct Tests {
-  Test<BinaryOrVoid<16>, 16, 5, 10> test16;
-  Test<BinaryOrVoid<32>, 32, 8, 23> test32;
-  Test<BinaryOrVoid<64>, 64, 11, 52> test64;
-  Test<BinaryOrVoid<128>, 128, 15, 112> test128;
+  TestIfNotVoid<BinaryOrVoid<16>, 16, 5, 10> test16;
+  TestIfNotVoid<BinaryOrVoid<32>, 32, 8, 23> test32;
+  TestIfNotVoid<BinaryOrVoid<64>, 64, 11, 52> test64;
+  TestIfNotVoid<BinaryOrVoid<128>, 128, 15, 112> test128;
 };
 
 }  // namespace detail

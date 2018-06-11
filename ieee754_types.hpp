@@ -101,7 +101,7 @@ struct FindType<F> {
   using type = void;
 };
 
-template <typename T, typename U = void>
+template <typename T, typename = void>
 struct AssertNonVoid {
   using type = T;
 };
@@ -118,14 +118,17 @@ template <int storage_bits,
               standard_binary_interchange_format_exponent_bits<storage_bits>(),
           int mantissa_bits =
               standard_binary_interchange_format_mantissa_bits<storage_bits>()>
-using Binary = typename AssertNonVoid<
-    typename FindType<Is_Ieee754_2008_Binary_Interchange_Format<
-                          storage_bits, exponent_bits, mantissa_bits>,
-                      float, double, long double>::type>::type;
+using Binary =                                                        //
+    typename AssertNonVoid<                                           //
+        typename FindType<                                            //
+            Is_Ieee754_2008_Binary_Interchange_Format<storage_bits,   //
+                                                      exponent_bits,  //
+                                                      mantissa_bits>,
+            float, double, long double>::type>::type;
 
 ///////////////////////////////////////
 // TODO
-template <typename T, int storage_bits, typename  = void>
+template <typename T, int storage_bits, typename = void>
 struct TestStorageBits {
   static_assert(sizeof(T) == storage_bits / CHAR_BIT, "");
 };

@@ -93,19 +93,7 @@ struct Is_Ieee754_2008_Binary_Interchange_Format {
 
 ///////////////////////////////
 
-// WIP
-template <typename T>
-static constexpr bool is_binary_interchange_format(int storage_bits,
-                                                   int exponent_bits,
-                                                   int mantissa_bits) {
-  return ::std::is_floating_point<T>() &&            //
-         ::std::numeric_limits<T>::is_iec559 &&      //
-         ::std::numeric_limits<T>::radix == 2 &&     //
-         get_storage_bits<T>() == storage_bits &&    //
-         get_exponent_bits<T>() == exponent_bits &&  //
-         get_mantissa_bits<T>() == mantissa_bits;
-}
-
+// TODO: clang-format doesn't do a good job formatting the following,
 template <int storage_bits, int exponent_bits, int mantissa_bits, typename T>
 constexpr bool is_binary_interchange_format =
     ::std::is_floating_point<T>() &&       //

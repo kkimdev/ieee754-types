@@ -124,7 +124,8 @@ using Binary = typename AssertNonVoid<
                       float, double, long double>::type>::type;
 
 ///////////////////////////////////////
-template <typename T, int storage_bits, typename U = void>
+// TODO
+template <typename T, int storage_bits, typename  = void>
 struct TestStorageBits {
   static_assert(sizeof(T) == storage_bits / CHAR_BIT, "");
 };

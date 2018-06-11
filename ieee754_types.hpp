@@ -131,10 +131,10 @@ using BinaryOrError =
 
 ///////////////////////////////////////
 // TODO:
-template <int storage_bits, int exponent_bits, int mantissa_bits,
+template <typename T, int storage_bits, int exponent_bits, int mantissa_bits,
           typename = void>
 struct Test {
-  using T = BinaryOrError<storage_bits>;
+  //   using T = BinaryOrError<storage_bits>;
   static_assert(get_storage_bits<T>() == storage_bits, "");
   static_assert(get_exponent_bits<T>() == exponent_bits, "");
   static_assert(get_mantissa_bits<T>() == mantissa_bits, "");
@@ -146,10 +146,10 @@ struct Test<
     ::std::enable_if_t<::std::is_same_v<BinaryOrVoid<storage_bits>, void>>> {};
 
 struct Tests {
-  Test<16, 5, 10> test16;
-  Test<32, 8, 23> test32;
-  Test<64, 11, 52> test64;
-  Test<128, 15, 112> test128;
+  Test<BinaryOrVoid<16>, 16, 5, 10> test16;
+  Test<BinaryOrVoid<32>, 32, 8, 23> test32;
+  Test<BinaryOrVoid<64>, 64, 11, 52> test64;
+  Test<BinaryOrVoid<128>, 128, 15, 112> test128;
 };
 
 }  // namespace detail

@@ -94,31 +94,32 @@ struct Is_Ieee754_2008_Binary_Interchange_Format {
 ///////////////////////////////
 
 // WIP
-// template <int storage_bits, int exponent_bits, int mantissa_bits, typename T>
-// static constexpr bool is_binary_interchange_format() {
-//   return ::std::is_floating_point<T>() &&            //
-//          ::std::numeric_limits<T>::is_iec559 &&      //
-//          ::std::numeric_limits<T>::radix == 2 &&     //
-//          get_storage_bits<T>() == storage_bits &&    //
-//          get_exponent_bits<T>() == exponent_bits &&  //
-//          get_mantissa_bits<T>() == mantissa_bits;
-// }
+template <typename T>
+static constexpr bool is_binary_interchange_format(int storage_bits,
+                                                   int exponent_bits,
+                                                   int mantissa_bits) {
+  return ::std::is_floating_point<T>() &&            //
+         ::std::numeric_limits<T>::is_iec559 &&      //
+         ::std::numeric_limits<T>::radix == 2 &&     //
+         get_storage_bits<T>() == storage_bits &&    //
+         get_exponent_bits<T>() == exponent_bits &&  //
+         get_mantissa_bits<T>() == mantissa_bits;
+}
 
-// template <int storage_bits, int exponent_bits, int mantissa_bits>
-// void find_type();
+template <int storage_bits, int exponent_bits, int mantissa_bits>
+void find_type();
 
-// template <int storage_bits, int exponent_bits, int mantissa_bits, typename T,
-//           typename... Ts>
-// auto find_type() {
-//   if constexpr (is_binary_interchange_format<storage_bits,   //
-//                                              exponent_bits,  //
-//                                              mantissa_bits,  //
-//                                              T>()) {
-//     return T();
-//   } else {
-//     return find_type<storage_bits, exponent_bits, mantissa_bits, Ts...>();
-//   }
-// }
+template <int storage_bits, int exponent_bits, int mantissa_bits, typename T,
+          typename... Ts>
+auto find_type() {
+  if constexpr (is_binary_interchange_format<T>(storage_bits,   //
+                                                exponent_bits,  //
+                                                mantissa_bits)) {
+    return T();
+  } else {
+    return find_type<storage_bits, exponent_bits, mantissa_bits, Ts...>();
+  }
+}
 
 ///////////////////////////////
 

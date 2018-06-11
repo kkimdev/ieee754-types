@@ -102,12 +102,13 @@ struct FindType<F> {
 };
 
 template <typename T, typename = void>
-struct AssertNonVoid {
+struct AssertTypeFound {
   using type = T;
 };
 
+// Error if T is void.
 template <typename T>
-struct AssertNonVoid<T, ::std::enable_if_t<::std::is_same_v<T, void>>> {
+struct AssertTypeFound<T, ::std::enable_if_t<::std::is_same_v<T, void>>> {
   static_assert(
       !::std::is_same_v<T, T>,
       "No corresponding IEEE 754-2008 binary interchange format found.");
@@ -118,36 +119,44 @@ template <int storage_bits,
               standard_binary_interchange_format_exponent_bits<storage_bits>(),
           int mantissa_bits =
               standard_binary_interchange_format_mantissa_bits<storage_bits>()>
-using Binary =                                                        //
-    typename AssertNonVoid<                                           //
-        typename FindType<                                            //
-            Is_Ieee754_2008_Binary_Interchange_Format<storage_bits,   //
-                                                      exponent_bits,  //
-                                                      mantissa_bits>,
-            float, double, long double>::type>::type;
+using BinaryOrVoid = typename FindType<                       //
+    Is_Ieee754_2008_Binary_Interchange_Format<storage_bits,   //
+                                              exponent_bits,  //
+                                              mantissa_bits>,
+    float, double, long double>::type;
+
+template <int storage_bits>
+using BinaryOrError =
+    typename AssertTypeFound<BinaryOrVoid<storage_bits>>::type;
 
 ///////////////////////////////////////
-// TODO
-template <typename T, int storage_bits, typename = void>
-struct TestStorageBits {
-  static_assert(sizeof(T) == storage_bits / CHAR_BIT, "");
+// TODO:
+template <int storage_bits, int exponent_bits, int mantissa_bits,
+          typename = void>
+struct Test {
+  using T = BinaryOrError<storage_bits>;
+  static_assert(get_storage_bits<T>() == storage_bits, "");
+  static_assert(get_exponent_bits<T>() == exponent_bits, "");
+  static_assert(get_mantissa_bits<T>() == mantissa_bits, "");
 };
 
-template <typename T, int storage_bits>
-struct TestStorageBits<T,             //
-                       storage_bits,  //
-                       ::std::enable_if_t<::std::is_same_v<T, void>>> {};
+template <int storage_bits, int exponent_bits, int mantissa_bits>
+struct Test<
+    storage_bits, exponent_bits, mantissa_bits,
+    ::std::enable_if_t<::std::is_same_v<BinaryOrVoid<storage_bits>, void>>> {};
 
-TestStorageBits<float, 32> f1;
-TestStorageBits<double, 64> f2;
-
-///////////////////////////////////////
+struct Tests {
+  Test<16, 5, 10> test16;
+  Test<32, 8, 23> test32;
+  Test<64, 11, 52> test64;
+  Test<128, 15, 112> test128;
+}
 
 }  // namespace detail
 
 namespace _2008 {
 template <int storage_bits>
-using Binary = detail::Binary<storage_bits>;
+using Binary = detail::BinaryOrError<storage_bits>;
 }  // namespace _2008
 
 }  // namespace IEEE_754

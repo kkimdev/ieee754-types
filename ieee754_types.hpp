@@ -4,7 +4,8 @@
 // Based on IEEE 754-2008
 
 #include <climits>
-#include <stdexcept>
+#include <limits>
+#include <type_traits>
 
 namespace IEEE_754 {
 namespace detail {

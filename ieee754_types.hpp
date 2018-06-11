@@ -114,9 +114,6 @@ template <int storage_bits, int exponent_bits, int mantissa_bits, typename T,
 constexpr auto find_type() {
   if constexpr (is_binary_interchange_format<storage_bits, exponent_bits,
                                              mantissa_bits, T>) {
-    // if constexpr (is_binary_interchange_format<T>(storage_bits,   //
-    //                                               exponent_bits,  //
-    //                                               mantissa_bits)) {
     return T();
   } else {
     return find_type<storage_bits, exponent_bits, mantissa_bits, Ts...>();

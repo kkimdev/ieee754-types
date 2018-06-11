@@ -119,7 +119,7 @@ template <int storage_bits,
               standard_binary_interchange_format_exponent_bits<storage_bits>(),
           int mantissa_bits =
               standard_binary_interchange_format_mantissa_bits<storage_bits>()>
-using BinaryOrVoid = typename FindType<                       //
+using BinaryFloatOrVoid = typename FindType<                  //
     Is_Ieee754_2008_Binary_Interchange_Format<storage_bits,   //
                                               exponent_bits,  //
                                               mantissa_bits>,
@@ -127,27 +127,26 @@ using BinaryOrVoid = typename FindType<                       //
 
 template <int storage_bits>
 using BinaryOrError =
-    typename AssertTypeFound<BinaryOrVoid<storage_bits>>::type;
+    typename AssertTypeFound<BinaryFloatOrVoid<storage_bits>>::type;
 
-///////////////////////////////////////
-// TODO:
 template <typename T, int storage_bits, int exponent_bits, int mantissa_bits,
           typename = void>
-struct TestIfNotVoid {
+struct AssertBitsIfNotVoid {
   static_assert(get_storage_bits<T>() == storage_bits, "");
   static_assert(get_exponent_bits<T>() == exponent_bits, "");
   static_assert(get_mantissa_bits<T>() == mantissa_bits, "");
 };
 
+// Disable asserts if T == void.
 template <typename T, int storage_bits, int exponent_bits, int mantissa_bits>
-struct TestIfNotVoid<T, storage_bits, exponent_bits, mantissa_bits,
-                     ::std::enable_if_t<::std::is_same_v<T, void>>> {};
+struct AssertBitsIfNotVoid<T, storage_bits, exponent_bits, mantissa_bits,
+                           ::std::enable_if_t<::std::is_same_v<T, void>>> {};
 
-struct Tests {
-  TestIfNotVoid<BinaryOrVoid<16>, 16, 5, 10> test16;
-  TestIfNotVoid<BinaryOrVoid<32>, 32, 8, 23> test32;
-  TestIfNotVoid<BinaryOrVoid<64>, 64, 11, 52> test64;
-  TestIfNotVoid<BinaryOrVoid<128>, 128, 15, 112> test128;
+struct Asserts {
+  AssertBitsIfNotVoid<BinaryFloatOrVoid<16>, 16, 5, 10> test16;
+  AssertBitsIfNotVoid<BinaryFloatOrVoid<32>, 32, 8, 23> test32;
+  AssertBitsIfNotVoid<BinaryFloatOrVoid<64>, 64, 11, 52> test64;
+  AssertBitsIfNotVoid<BinaryFloatOrVoid<128>, 128, 15, 112> test128;
 };
 
 }  // namespace detail

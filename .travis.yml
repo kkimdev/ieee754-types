@@ -1,0 +1,4 @@
+language: cpp
+compiler: clang
+script:
+ - clang++ -std=c++17 -stdlib=libc++ -Wall ieee754_types.hpp

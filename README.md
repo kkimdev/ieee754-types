@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/kkimdev/ieee754-types.svg?branch=master)](https://travis-ci.org/kkimdev/ieee754-types)
+
 # IEEE 754 Types
 This is a single header file C++ library that provides IEEE 754 floating point types.
 Example usage:

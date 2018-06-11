@@ -3,6 +3,10 @@
 
 // Based on IEEE 754-2008
 
+#if __cplusplus < 201703L
+#error This file requires C++17
+#endif
+
 #include <climits>
 #include <limits>
 #include <type_traits>

@@ -134,32 +134,37 @@ template <int storage_bits>
 using BinaryFloatOrError =
     typename AssertTypeFound<BinaryFloatOrVoid<storage_bits>>::type;
 
-template <typename T, int storage_bits, int exponent_bits, int mantissa_bits,
-          typename = void>
-struct AssertBitsIfNotVoid {
-  static_assert(get_storage_bits<T>() == storage_bits, "");
-  static_assert(get_exponent_bits<T>() == exponent_bits, "");
-  static_assert(get_mantissa_bits<T>() == mantissa_bits, "");
-};
-
-// Disable asserts if T == void.
-template <typename T, int storage_bits, int exponent_bits, int mantissa_bits>
-struct AssertBitsIfNotVoid<T, storage_bits, exponent_bits, mantissa_bits,
-                           ::std::enable_if_t<::std::is_same_v<T, void>>> {};
-
-struct Asserts {
-  AssertBitsIfNotVoid<BinaryFloatOrVoid<16>, 16, 5, 10> test16;
-  AssertBitsIfNotVoid<BinaryFloatOrVoid<32>, 32, 8, 23> test32;
-  AssertBitsIfNotVoid<BinaryFloatOrVoid<64>, 64, 11, 52> test64;
-  AssertBitsIfNotVoid<BinaryFloatOrVoid<128>, 128, 15, 112> test128;
-};
-
 }  // namespace detail
 
 namespace _2008 {
 template <int storage_bits>
 using Binary = detail::BinaryFloatOrError<storage_bits>;
 }  // namespace _2008
+
+namespace detail {
+
+template <int storage_bits, int exponent_bits, int mantissa_bits,
+          typename = void>
+struct AssertBitsIfTypeExists {
+  using T = ::IEEE_754::_2008::Binary<storage_bits>;
+  static_assert(get_storage_bits<T>() == storage_bits, "");
+  static_assert(get_exponent_bits<T>() == exponent_bits, "");
+  static_assert(get_mantissa_bits<T>() == mantissa_bits, "");
+};
+
+template <int storage_bits, int exponent_bits, int mantissa_bits>
+struct AssertBitsIfTypeExists<storage_bits, exponent_bits, mantissa_bits,
+                              ::std::enable_if_t<::std::is_same_v<
+                                  BinaryFloatOrVoid<storage_bits>, void>>> {};
+
+struct Asserts {
+  AssertBitsIfTypeExists<16, 5, 10> test16;
+  AssertBitsIfTypeExists<32, 8, 23> test32;
+  AssertBitsIfTypeExists<64, 11, 52> test64;
+  AssertBitsIfTypeExists<128, 15, 112> test128;
+};
+
+}  // namespace detail
 
 }  // namespace IEEE_754
 

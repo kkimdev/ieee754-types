@@ -1,5 +1,6 @@
 # IEEE 754 Types
 This is a single header file C++ library that provides IEEE 754 floating point types.
+Example usage:
 
 ```c++
 #include <iostream>

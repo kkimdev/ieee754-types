@@ -150,7 +150,7 @@ struct Tests {
   Test<32, 8, 23> test32;
   Test<64, 11, 52> test64;
   Test<128, 15, 112> test128;
-}
+};
 
 }  // namespace detail
 

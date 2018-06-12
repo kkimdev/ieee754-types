@@ -144,6 +144,9 @@ void test_if_type_exists() {
 
   if constexpr (!::std::is_same_v<BinaryFloatOrVoid<storage_bits>, void>) {
     using T = ::IEEE_754::_2008::Binary<storage_bits>;
+    static_assert(::std::is_floating_point<T>(), "");
+    static_assert(::std::numeric_limits<T>::is_iec559, "");
+    static_assert(::std::numeric_limits<T>::radix == 2, "");
     static_assert(get_storage_bits<T>() == storage_bits, "");
     static_assert(get_exponent_bits<T>() == exponent_bits, "");
     static_assert(get_mantissa_bits<T>() == mantissa_bits, "");

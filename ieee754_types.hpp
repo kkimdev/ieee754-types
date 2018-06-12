@@ -147,15 +147,12 @@ struct AssertTypeFound {
   using type = T;
 };
 
-template <int storage_bits>
-using BinaryFloatOrError =
-    typename AssertTypeFound<BinaryFloatOrVoid<storage_bits>>::type;
-
 }  // namespace detail
 
 namespace _2008 {
 template <int storage_bits>
-using Binary = detail::BinaryFloatOrError<storage_bits>;
+using Binary = typename detail::AssertTypeFound<
+    detail::BinaryFloatOrVoid<storage_bits>>::type;
 }  // namespace _2008
 
 namespace detail {

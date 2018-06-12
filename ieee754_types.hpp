@@ -80,23 +80,23 @@ static_assert(standard_binary_interchange_format_mantissa_bits<128>() == 112,
 
 template <int storage_bits, int exponent_bits, int mantissa_bits>
 struct Is_Ieee754_2008_Binary_Interchange_Format {
+  // TODO: as of 2018-06-11 clang-format doesn't handle the following section
+  //       well.
+  // clang-format off
   template <typename T>
-  static constexpr bool value() {
-    return ::std::is_floating_point<T>() &&            //
-           ::std::numeric_limits<T>::is_iec559 &&      //
-           ::std::numeric_limits<T>::radix == 2 &&     //
-           get_storage_bits<T>() == storage_bits &&    //
-           get_exponent_bits<T>() == exponent_bits &&  //
-           get_mantissa_bits<T>() == mantissa_bits;
-  }
+  static constexpr bool value =
+      ::std::is_floating_point<T>()            &&
+      ::std::numeric_limits<T>::is_iec559      &&
+      ::std::numeric_limits<T>::radix == 2     &&
+      get_storage_bits<T>() == storage_bits    &&
+      get_exponent_bits<T>() == exponent_bits  &&
+      get_mantissa_bits<T>() == mantissa_bits;
+  // clang-format on
 };
-
-///////////////////////////////
-// TODO: WIP
 
 template <typename F, typename T, typename... Ts>
 constexpr auto find_type() {
-  if constexpr (F::template value<T>()) {
+  if constexpr (F::template value<T>) {
     return T();
   } else if constexpr (sizeof...(Ts) == 0) {
     return void();
@@ -105,33 +105,11 @@ constexpr auto find_type() {
   }
 }
 
-///////////////////////////////
-
-// Recursion termination.  Type not found.
-template <typename F, typename... Ts>
-struct FindType {
-  using type = void;
-};
-
-// Recursion
-template <typename F, typename T, typename... Ts>
-struct FindType<F, T, Ts...> {
-  // Set `type = T` if T satisfies the condition, F.  Otherwise, keep
-  // searching in the remaining types, Ts... .
-  using type = ::std::conditional_t<  //
-      F::template value<T>(), T, typename FindType<F, Ts...>::type>;
-};
-
 template <int storage_bits,
           int exponent_bits =
               standard_binary_interchange_format_exponent_bits<storage_bits>(),
           int mantissa_bits =
               standard_binary_interchange_format_mantissa_bits<storage_bits>()>
-// using BinaryFloatOrVoid = typename FindType<                  //
-//     Is_Ieee754_2008_Binary_Interchange_Format<storage_bits,   //
-//                                               exponent_bits,  //
-//                                               mantissa_bits>,
-//     float, double, long double>::type;
 using BinaryFloatOrVoid =
     decltype(find_type<                                                //
              Is_Ieee754_2008_Binary_Interchange_Format<storage_bits,   //
@@ -155,6 +133,7 @@ using Binary = typename detail::AssertTypeFound<
     detail::BinaryFloatOrVoid<storage_bits>>::type;
 }  // namespace _2008
 
+// Testing
 namespace detail {
 
 template <int storage_bits, int exponent_bits, int mantissa_bits,
@@ -166,6 +145,7 @@ struct AssertBitsIfTypeExists {
   static_assert(get_mantissa_bits<T>() == mantissa_bits, "");
 };
 
+// Disable test if BinaryFloatOrVoid<storage_bits> == void.
 template <int storage_bits, int exponent_bits, int mantissa_bits>
 struct AssertBitsIfTypeExists<storage_bits, exponent_bits, mantissa_bits,
                               ::std::enable_if_t<::std::is_same_v<

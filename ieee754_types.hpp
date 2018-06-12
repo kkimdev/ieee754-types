@@ -92,31 +92,16 @@ struct Is_Ieee754_2008_Binary_Interchange_Format {
 };
 
 ///////////////////////////////
+// TODO: WIP
 
-// TODO: WIP not used yet.
-// TODO: clang-format doesn't do a good job formatting the following,
-template <int storage_bits, int exponent_bits, int mantissa_bits, typename T>
-constexpr bool is_binary_interchange_format =
-    ::std::is_floating_point<T>() &&       //
-    ::std::numeric_limits<T>::is_iec559&&  //
-        ::std::numeric_limits<T>::radix
-        == 2 &&  //
-    get_storage_bits<T>() ==
-        storage_bits&&  //
-        get_exponent_bits<T>() ==
-        exponent_bits&&  //
-        get_mantissa_bits<T>() == mantissa_bits;
-
-template <int storage_bits, int exponent_bits, int mantissa_bits, typename T,
-          typename... Ts>
+template <typename F, typename T, typename... Ts>
 constexpr auto find_type() {
-  if constexpr (is_binary_interchange_format<  //
-                    storage_bits, exponent_bits, mantissa_bits, T>) {
+  if constexpr (F::template value<T>()) {
     return T();
-  } else if (sizeof...(Ts) == 0) {
+  } else if constexpr (sizeof...(Ts) == 0) {
     return void();
   } else {
-    return find_type<storage_bits, exponent_bits, mantissa_bits, Ts...>();
+    return find_type<F, Ts...>();
   }
 }
 
@@ -150,11 +135,17 @@ template <int storage_bits,
               standard_binary_interchange_format_exponent_bits<storage_bits>(),
           int mantissa_bits =
               standard_binary_interchange_format_mantissa_bits<storage_bits>()>
-using BinaryFloatOrVoid = typename FindType<                  //
-    Is_Ieee754_2008_Binary_Interchange_Format<storage_bits,   //
-                                              exponent_bits,  //
-                                              mantissa_bits>,
-    float, double, long double>::type;
+// using BinaryFloatOrVoid = typename FindType<                  //
+//     Is_Ieee754_2008_Binary_Interchange_Format<storage_bits,   //
+//                                               exponent_bits,  //
+//                                               mantissa_bits>,
+//     float, double, long double>::type;
+using BinaryFloatOrVoid =
+    decltype(find_type<                                                //
+             Is_Ieee754_2008_Binary_Interchange_Format<storage_bits,   //
+                                                       exponent_bits,  //
+                                                       mantissa_bits>,
+             float, double, long double>());
 
 template <int storage_bits>
 using BinaryFloatOrError =

@@ -114,7 +114,7 @@ constexpr auto find_type() {
                     storage_bits, exponent_bits, mantissa_bits, T>) {
     return T();
   } else if (sizeof...(Ts) == 0) {
-    return void();
+    return Ts;
   } else {
     return find_type<storage_bits, exponent_bits, mantissa_bits, Ts...>();
   }

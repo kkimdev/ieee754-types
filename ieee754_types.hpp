@@ -136,27 +136,22 @@ using Binary = typename detail::AssertTypeFound<
 // Testing
 namespace detail {
 
-template <int storage_bits, int exponent_bits, int mantissa_bits,
-          typename = void>
-struct AssertBitsIfTypeExists {
-  using T = ::IEEE_754::_2008::Binary<storage_bits>;
-  static_assert(get_storage_bits<T>() == storage_bits, "");
-  static_assert(get_exponent_bits<T>() == exponent_bits, "");
-  static_assert(get_mantissa_bits<T>() == mantissa_bits, "");
-};
-
-// Disable test if BinaryFloatOrVoid<storage_bits> == void.
 template <int storage_bits, int exponent_bits, int mantissa_bits>
-struct AssertBitsIfTypeExists<storage_bits, exponent_bits, mantissa_bits,
-                              ::std::enable_if_t<::std::is_same_v<
-                                  BinaryFloatOrVoid<storage_bits>, void>>> {};
+void test_if_type_exists() {
+  if constexpr (!::std::is_same_v<BinaryFloatOrVoid<storage_bits>, void>) {
+    using T = ::IEEE_754::_2008::Binary<storage_bits>;
+    static_assert(get_storage_bits<T>() == storage_bits, "");
+    static_assert(get_exponent_bits<T>() == exponent_bits, "");
+    static_assert(get_mantissa_bits<T>() == mantissa_bits, "");
+  }
+}
 
-struct Asserts {
-  AssertBitsIfTypeExists<16, 5, 10> test16;
-  AssertBitsIfTypeExists<32, 8, 23> test32;
-  AssertBitsIfTypeExists<64, 11, 52> test64;
-  AssertBitsIfTypeExists<128, 15, 112> test128;
-};
+void tests() {
+  test_if_type_exists<16, 5, 10>();
+  test_if_type_exists<32, 8, 23>();
+  test_if_type_exists<64, 11, 52>();
+  test_if_type_exists<128, 15, 112>();
+}
 
 }  // namespace detail
 

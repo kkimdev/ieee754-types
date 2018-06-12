@@ -93,6 +93,7 @@ struct Is_Ieee754_2008_Binary_Interchange_Format {
 
 ///////////////////////////////
 
+// TODO: WIP not used yet.
 // TODO: clang-format doesn't do a good job formatting the following,
 template <int storage_bits, int exponent_bits, int mantissa_bits, typename T>
 constexpr bool is_binary_interchange_format =
@@ -106,38 +107,34 @@ constexpr bool is_binary_interchange_format =
         exponent_bits&&  //
         get_mantissa_bits<T>() == mantissa_bits;
 
-template <int storage_bits, int exponent_bits, int mantissa_bits>
-void find_type();
-
 template <int storage_bits, int exponent_bits, int mantissa_bits, typename T,
           typename... Ts>
 constexpr auto find_type() {
-  if constexpr (is_binary_interchange_format<storage_bits, exponent_bits,
-                                             mantissa_bits, T>) {
+  if constexpr (is_binary_interchange_format<  //
+                    storage_bits, exponent_bits, mantissa_bits, T>) {
     return T();
+  } else if (sizeof...(Ts) == 0) {
+    return void();
   } else {
     return find_type<storage_bits, exponent_bits, mantissa_bits, Ts...>();
   }
-}  // namespace detail
+}
 
 ///////////////////////////////
 
+// Recursion termination.  Type not found.
 template <typename F, typename... Ts>
-struct FindType;
+struct FindType {
+  using type = void;
+};
 
 // Recursion
 template <typename F, typename T, typename... Ts>
 struct FindType<F, T, Ts...> {
-  // Set `type = T` if T satisfies the condition, F.  Otherwise, keep searching
-  // in the remaining types, Ts... .
+  // Set `type = T` if T satisfies the condition, F.  Otherwise, keep
+  // searching in the remaining types, Ts... .
   using type = ::std::conditional_t<  //
       F::template value<T>(), T, typename FindType<F, Ts...>::type>;
-};
-
-// Recursion termination.  Type not found.
-template <typename F>
-struct FindType<F> {
-  using type = void;
 };
 
 template <typename T>

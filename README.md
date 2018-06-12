@@ -14,7 +14,7 @@ int main() {
 
   std::cout << x + y << std::endl;
 
-  // Compile time error if the request type doesn't exist in the system.
+  // Compile time error if the requested type doesn't exist in the system.
   // IEEE_754::_2008::Binary<16> z;
 }
 ```

@@ -122,14 +122,6 @@ struct FindType<F, T, Ts...> {
       F::template value<T>(), T, typename FindType<F, Ts...>::type>;
 };
 
-template <typename T>
-struct AssertTypeFound {
-  static_assert(
-      !::std::is_same_v<T, void>,
-      "No corresponding IEEE 754-2008 binary interchange format found.");
-  using type = T;
-};
-
 template <int storage_bits,
           int exponent_bits =
               standard_binary_interchange_format_exponent_bits<storage_bits>(),
@@ -146,6 +138,14 @@ using BinaryFloatOrVoid =
                                                        exponent_bits,  //
                                                        mantissa_bits>,
              float, double, long double>());
+
+template <typename T>
+struct AssertTypeFound {
+  static_assert(
+      !::std::is_same_v<T, void>,
+      "No corresponding IEEE 754-2008 binary interchange format found.");
+  using type = T;
+};
 
 template <int storage_bits>
 using BinaryFloatOrError =

@@ -94,14 +94,14 @@ struct Is_Ieee754_2008_Binary_Interchange_Format {
   // clang-format on
 };
 
-template <typename F, typename T, typename... Ts>
+template <typename C, typename T, typename... Ts>
 constexpr auto find_type() {
-  if constexpr (F::template value<T>) {
+  if constexpr (C::template value<T>) {
     return T();
   } else if constexpr (sizeof...(Ts) == 0) {
     return void();
   } else {
-    return find_type<F, Ts...>();
+    return find_type<C, Ts...>();
   }
 }
 

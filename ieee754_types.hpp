@@ -100,10 +100,10 @@ constexpr auto find_type() {
 
   if constexpr (C::template value<T>) {
     return T();
-  } else if constexpr (sizeof...(Ts) == 0) {
-    return void();
-  } else {
+  } else if constexpr (sizeof...(Ts) >= 1) {
     return find_type<C, Ts...>();
+  } else {
+    return void();
   }
 }
 

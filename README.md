@@ -18,3 +18,7 @@ int main() {
   // IEEE_754::_2008::Binary<16> z;
 }
 ```
+
+The type provided by this library `IEEE_754_2008_Binary<n>` is guaranteed to be IEEE 754 floating point, and it won't compile if the requested type is not available in the system.
+
+For more details, please refer to this blog article <https://kkimdev.blogspot.com/2018/06/i-dont-trust-float-overengineering.html> .

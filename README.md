@@ -21,4 +21,4 @@ int main() {
 
 The type provided by this library `IEEE_754_2008_Binary<n>` is guaranteed to be IEEE 754 floating point, and it won't compile if the requested type is not available in the system.
 
-For more details, please refer to this blog article <https://kkimdev.github.io/posts/2018/06/15/IEEE-754-Floating-Point-Type-in-C++-Overengineering-Series-1.html> .
+For more details, please refer to this blog article [IEEE 754 Floating Point Type in C++ - Overengineering Series #1](https://kkimdev.github.io/posts/2018/06/15/IEEE-754-Floating-Point-Type-in-C++-Overengineering-Series-1.html) .

@@ -19,12 +19,12 @@ namespace IEEE_754 {
 namespace detail {
 
 template <typename T>
-constexpr int get_storage_bits() {
+inline constexpr int get_storage_bits() {
   return sizeof(T) * CHAR_BIT;
 }
 
 template <typename T>
-constexpr int get_exponent_bits() {
+inline constexpr int get_exponent_bits() {
   int exponent_range = ::std::numeric_limits<T>::max_exponent -
                        ::std::numeric_limits<T>::min_exponent;
   int bits = 0;
@@ -33,12 +33,12 @@ constexpr int get_exponent_bits() {
 }
 
 template <typename T>
-constexpr int get_mantissa_bits() {
+inline constexpr int get_mantissa_bits() {
   return ::std::numeric_limits<T>::digits - 1;
 }
 
 template <int storage_bits>
-constexpr int standard_binary_interchange_format_exponent_bits() {
+inline constexpr int standard_binary_interchange_format_exponent_bits() {
   constexpr bool is_valid_storage_bits =
       storage_bits == 16 ||   //
       storage_bits == 32 ||   //
@@ -62,21 +62,20 @@ constexpr int standard_binary_interchange_format_exponent_bits() {
 }
 
 template <int storage_bits>
-constexpr int standard_binary_interchange_format_mantissa_bits() {
+inline constexpr int standard_binary_interchange_format_mantissa_bits() {
   return storage_bits -
          standard_binary_interchange_format_exponent_bits<storage_bits>() - 1;
 }
 
-static_assert(standard_binary_interchange_format_exponent_bits<16>() == 5, "");
-static_assert(standard_binary_interchange_format_mantissa_bits<16>() == 10, "");
-static_assert(standard_binary_interchange_format_exponent_bits<32>() == 8, "");
-static_assert(standard_binary_interchange_format_mantissa_bits<32>() == 23, "");
-static_assert(standard_binary_interchange_format_exponent_bits<64>() == 11, "");
-static_assert(standard_binary_interchange_format_mantissa_bits<64>() == 52, "");
-static_assert(standard_binary_interchange_format_exponent_bits<128>() == 15,
-              "");
-static_assert(standard_binary_interchange_format_mantissa_bits<128>() == 112,
-              "");
+static_assert(standard_binary_interchange_format_exponent_bits<16>()  == 5,  "");
+static_assert(standard_binary_interchange_format_exponent_bits<32>()  == 8,  "");
+static_assert(standard_binary_interchange_format_exponent_bits<64>()  == 11, "");
+static_assert(standard_binary_interchange_format_exponent_bits<128>() == 15, "");
+
+static_assert(standard_binary_interchange_format_mantissa_bits<16>()  == 10, "");
+static_assert(standard_binary_interchange_format_mantissa_bits<32>()  == 23, "");
+static_assert(standard_binary_interchange_format_mantissa_bits<64>()  == 52, "");
+static_assert(standard_binary_interchange_format_mantissa_bits<128>() == 112,"");
 
 template <int storage_bits, int exponent_bits, int mantissa_bits>
 struct Is_Ieee754_2008_Binary_Interchange_Format {
@@ -95,7 +94,7 @@ struct Is_Ieee754_2008_Binary_Interchange_Format {
 };
 
 template <typename C, typename T, typename... Ts>
-constexpr auto find_type() {
+inline constexpr auto find_type() {
   throw;
 
   if constexpr (C::template value<T>) {
@@ -139,7 +138,7 @@ using Binary = typename detail::AssertTypeFound<
 namespace detail {
 
 template <int storage_bits, int exponent_bits, int mantissa_bits>
-void test_if_type_exists() {
+inline void test_if_type_exists() {
   throw;
 
   if constexpr (!::std::is_same_v<BinaryFloatOrVoid<storage_bits>, void>) {
@@ -153,7 +152,7 @@ void test_if_type_exists() {
   }
 }
 
-void tests() {
+inline void tests() {
   throw;
 
   test_if_type_exists<16, 5, 10>();
